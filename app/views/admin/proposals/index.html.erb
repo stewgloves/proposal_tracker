@@ -1,0 +1,45 @@
+<!-- app/views/admin/proposals/index.html.erb -->
+<h1 class="text-2xl font-semibold mb-4">Admin - All Proposals</h1>
+
+<div class="overflow-x-auto">
+  <table class="min-w-full bg-white rounded-lg overflow-hidden">
+    <thead>
+    <tr>
+      <th class="py-2 px-4 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Title</th>
+      <th class="py-2 px-4 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+      <th class="py-2 px-4 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Owner</th>
+      <th class="py-2 px-4 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Project</th>
+      <th class="py-2 px-4 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @proposals.each do |proposal| %>
+      <tr class="border-b">
+        <td class="py-2 px-4"><%= link_to proposal.title, admin_proposal_path(proposal), class: "text-blue-500 hover:underline" %></td>
+        <td class="py-2 px-4">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_badge(proposal.status) %>">
+              <%= proposal.status.capitalize %>
+            </span>
+        </td>
+        <td class="py-2 px-4"><%= proposal.user.email %></td>
+        <td class="py-2 px-4"><%= link_to proposal.project.name, admin_project_path(proposal.project), class: "text-blue-500 hover:underline" %></td>
+        <td class="py-2 px-4">
+          <%= link_to 'Edit', edit_admin_proposal_path(proposal), class: "text-yellow-500 hover:text-yellow-700 mr-2" %>
+          <%= link_to 'Delete', admin_proposal_path(proposal), method: :delete, data: { confirm: 'Are you sure?' }, class: "text-red-500 hover:text-red-700 mr-2" %>
+          <%= link_to 'Show', admin_proposal_path(proposal), class: "text-blue-500 hover:text-blue-700" %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+<div class="mt-6">
+  <%= paginate @proposals, theme: 'tailwind' %>
+</div>
+
+<!-- Back Link -->
+<div class="mt-6">
+  <%= link_to 'Back to Admin Dashboard', root_path, class: "text-blue-500 hover:underline" %>
+</div>

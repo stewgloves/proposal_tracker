@@ -2,76 +2,110 @@ source "https://rubygems.org"
 
 ruby "3.3.4"
 
-# Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+# Rails framework
 gem "rails", "~> 7.1.3", ">= 7.1.3.4"
 
-# The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
+# Asset pipeline
 gem "sprockets-rails"
 
-# Use postgresql as the database for Active Record
+# PostgreSQL as the database for Active Record
 gem "pg", "~> 1.1"
 
-# Use the Puma web server [https://github.com/puma/puma]
+# Puma web server
 gem "puma", ">= 5.0"
 
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
+# Import maps for managing JavaScript dependencies
 gem "importmap-rails"
 
-# Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
+# Hotwire Turbo for accelerated navigation
 gem "turbo-rails"
 
-# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
+# Hotwire Stimulus for modest JavaScript
 gem "stimulus-rails"
 
-# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
+# Tailwind CSS for styling
 gem "tailwindcss-rails"
 
-# Build JSON APIs with ease [https://github.com/rails/jbuilder]
+# Jbuilder for building JSON APIs
 gem "jbuilder"
 
-# Use Redis adapter to run Action Cable in production
-# gem "redis", ">= 4.0.1"
-
-# Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
-# gem "kredis"
-
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
-
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+# Time zone data for Windows
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
-# Reduces boot times through caching; required in config/boot.rb
+# Bootsnap to speed up boot times
 gem "bootsnap", require: false
 
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+# RSpec for testing
+gem "rspec-rails", "~> 7.0", groups: [:development, :test]
+
+# Devise for user authentication
+gem "devise", "~> 4.9"
+
+# Pundit for authorization
+gem "pundit", "~> 2.4"
+
+# Sidekiq for background jobs
+gem "sidekiq", "~> 7.3"
+
+# Ransack for search and filtering
+gem "ransack", "~> 4.2"
+
+# Kaminari for pagination
+gem "kaminari", "~> 1.2"
+
+# AASM for state machines (proposal workflow)
+gem "aasm", "~> 5.3"
+
+# PaperTrail for activity logging
+gem "paper_trail", "~> 12.0"
+
+# ActsAsCommentableWithThreading for threaded comments
+gem "acts_as_commentable_with_threading", "~> 2.0.1"
+
+# Slack Ruby Client for Slack integration
+gem "slack-ruby-client", "~> 2.4.0"
+
+# Chartkick for charts and graphs
+gem "chartkick", "~> 4.0"
+
+# Groupdate for grouping data in charts
+gem "groupdate", "~> 6.1"
+
+# dotenv-rails for managing environment variables
+gem "dotenv-rails", groups: [:development, :test]
+
+# FactoryBot for testing
+gem "factory_bot_rails", "~> 6.4.3", groups: [:development, :test]
+
+# Faker for generating test data
+gem "faker", "~> 3.0", groups: [:development, :test]
+
+# CSV export capabilities
+gem "csv", "~> 3.1"
+
+gem 'whenever', require: false
 
 group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  # Debugging tools
   gem "debug", platforms: %i[ mri windows ]
 end
 
 group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
+  # Web console for debugging in the browser
   gem "web-console"
 
-  # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
-  # gem "rack-mini-profiler"
+  # Spring for faster Rails commands
+  gem "spring"
+  gem "spring-watcher-listen", "~> 2.0.0"
 
-  # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
-  # gem "spring"
+  # Rack Mini Profiler for performance profiling
+  gem "rack-mini-profiler"
 end
 
+group :production do
+  # Redis for Action Cable and Sidekiq in production
+  gem "redis", "~> 4.0"
+end
 
-gem "rspec-rails", "~> 7.0", :groups => [:development, :test]
-
-gem "devise", "~> 4.9"
-
-gem "pundit", "~> 2.4"
-
-gem "sidekiq", "~> 7.3"
-
-gem "ransack", "~> 4.2"
-
-gem "kaminari", "~> 1.2"
+# Use Active Storage variants
+gem "image_processing", "~> 1.2"

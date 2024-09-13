@@ -1,0 +1,129 @@
+<!-- app/views/proposals/show.html.erb -->
+<div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+  <h1 class="text-3xl font-bold mb-4"><%= @proposal.title %></h1>
+  <p class="text-gray-700 mb-2"><strong>Description:</strong> <%= @proposal.description %></p>
+  <p class="text-gray-700 mb-2"><strong>Status:</strong> <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_badge(@proposal.status) %>"><%= @proposal.status.capitalize %></span></p>
+  <p class="text-gray-700 mb-2"><strong>Owner:</strong> <%= @proposal.user.email %></p>
+  <p class="text-gray-700 mb-4"><strong>Project:</strong> <%= link_to @proposal.project.name, @proposal.project, class: "text-blue-500 hover:underline" %></p>
+
+  <h3 class="text-xl font-semibold mb-2">Documents:</h3>
+  <ul class="list-disc list-inside mb-4">
+    <% @proposal.documents.each do |document| %>
+      <li><%= link_to document.filename.to_s, url_for(document), class: "text-blue-500 hover:underline" %></li>
+    <% end %>
+  </ul>
+
+  <!-- Progress Bar -->
+  <div class="mb-4">
+    <div class="w-full bg-gray-200 rounded-full h-4">
+      <% case @proposal.status %>
+      <% when 'accepted' %>
+        <div class="bg-green-500 h-4 rounded-full" style="width: 25%"></div>
+      <% when 'under_review' %>
+        <div class="bg-yellow-500 h-4 rounded-full" style="width: 50%"></div>
+      <% when 'approved' %>
+        <div class="bg-blue-500 h-4 rounded-full" style="width: 75%"></div>
+      <% when 'scheduled' %>
+        <div class="bg-purple-500 h-4 rounded-full" style="width: 100%"></div>
+      <% when 'rejected' %>
+        <div class="bg-red-500 h-4 rounded-full" style="width: 100%"></div>
+      <% end %>
+    </div>
+    <p class="text-sm text-gray-600 mt-1">Progress: <%= @proposal.status.capitalize %></p>
+  </div>
+
+  <!-- Action Links -->
+  <div class="flex space-x-4">
+    <% if policy(@proposal).submit_review? && @proposal.status == 'accepted' %>
+      <%= link_to 'Submit for Review', submit_review_proposal_path(@proposal), method: :patch, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    <% end %>
+
+    <% if policy(@proposal).approve? %>
+      <%= link_to 'Approve', approve_proposal_path(@proposal), method: :patch, class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
+      <%= link_to 'Reject', reject_proposal_path(@proposal), method: :patch, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" %>
+    <% end %>
+
+    <% if policy(@proposal).schedule? && @proposal.status == 'approved' %>
+      <%= link_to 'Schedule', schedule_proposal_path(@proposal), method: :patch, class: "bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" %>
+    <% end %>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="mt-8">
+    <h3 class="text-xl font-semibold mb-4">Comments</h3>
+
+    <!-- Display Existing Comments -->
+    <div class="space-y-4">
+      <% @proposal.comments.order(created_at: :desc).each do |comment| %>
+        <div class="border rounded p-4">
+          <div class="flex justify-between mb-2">
+            <div class="font-bold"><%= comment.user.email %></div>
+            <div class="text-sm text-gray-500"><%= time_ago_in_words(comment.created_at) %> ago</div>
+          </div>
+          <p class="text-gray-700"><%= comment.body %></p>
+          <% if policy(comment).destroy? %>
+            <div class="mt-2">
+              <%= link_to 'Delete', proposal_comment_path(@proposal, comment), method: :delete, data: { confirm: 'Are you sure?' }, class: "text-red-500 hover:text-red-700 text-sm" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Add New Comment Form -->
+    <div class="mt-6">
+      <%= form_with(model: [@proposal, Comment.new], local: true, class: "bg-gray-100 p-4 rounded shadow") do |form| %>
+        <div class="mb-4">
+          <%= form.label :body, "Add a Comment", class: "block text-gray-700 text-sm font-bold mb-2" %>
+          <%= form.text_area :body, rows: 3, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+        </div>
+        <div>
+          <%= form.submit "Post Comment", class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Activity Logs -->
+  <div class="mt-8">
+    <h3 class="text-xl font-semibold mb-4">Activity Log</h3>
+    <% if @proposal.versions.any? %>
+      <ul class="space-y-2">
+        <% @proposal.versions.order(created_at: :desc).each do |version| %>
+          <li class="border rounded p-4">
+            <div class="flex justify-between mb-2">
+              <div class="font-bold"><%= version.whodunnit ? User.find(version.whodunnit).email : "System" %></div>
+              <div class="text-sm text-gray-500"><%= version.created_at.strftime("%B %d, %Y %I:%M %p") %></div>
+            </div>
+            <div class="text-gray-700">
+              <% if version.event == "create" %>
+                Created the proposal.
+              <% elsif version.event == "update" %>
+                Updated the proposal:
+                <ul class="list-disc list-inside">
+                  <% version.changeset.each do |field, changes| %>
+                    <li><strong><%= field.humanize %>:</strong> <%= changes.first %> &rarr; <%= changes.last %></li>
+                  <% end %>
+                </ul>
+              <% elsif version.event == "destroy" %>
+                Deleted the proposal.
+              <% else %>
+                Performed an action: <%= version.event %>
+              <% end %>
+            </div>
+            <div class="mt-2 text-right">
+              <%= link_to 'Revert to This Version', revert_version_proposal_path(@proposal, version_id: version.id), method: :post, data: { confirm: 'Are you sure you want to revert to this version?' }, class: "bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm" %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-gray-700">No activity recorded.</p>
+    <% end %>
+  </div>
+
+  <!-- Back Link -->
+  <div class="mt-6">
+    <%= link_to 'Back to Proposals', proposals_path, class: "text-blue-500 hover:underline" %>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<!-- app/views/dashboard/index.html.erb -->
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+
+  <!-- Key Metrics -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-2">Total Proposals</h2>
+      <p class="text-4xl font-bold text-blue-500"><%= @total_proposals %></p>
+    </div>
+    <div class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-2">Under Review</h2>
+      <p class="text-4xl font-bold text-yellow-500"><%= @under_review_proposals %></p>
+    </div>
+    <div class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-2">Approved</h2>
+      <p class="text-4xl font-bold text-green-500"><%= @approved_proposals %></p>
+    </div>
+  </div>
+
+  <!-- Proposals by Status Over Time -->
+  <div class="bg-white shadow rounded-lg p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4">Proposals by Status Over Time</h2>
+    <%= line_chart @proposals_by_status, height: "300px", colors: ["#1D4ED8"] %>
+  </div>
+
+  <!-- Recent Proposals -->
+  <div class="bg-white shadow rounded-lg p-6">
+    <h2 class="text-xl font-semibold mb-4">Recent Proposals</h2>
+    <ul class="space-y-4">
+      <% @recent_proposals.each do |proposal| %>
+        <li class="border-b pb-2">
+          <%= link_to proposal.title, proposal, class: "text-blue-500 hover:underline text-lg font-medium" %>
+          <p class="text-gray-600"><%= proposal.description.truncate(100) %></p>
+          <p class="text-sm text-gray-500">Status: <span class="font-semibold"><%= proposal.status.capitalize %></span></p>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>

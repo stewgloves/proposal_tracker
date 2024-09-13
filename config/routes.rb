@@ -1,11 +1,43 @@
+# config/routes.rb
+
 Rails.application.routes.draw do
   devise_for :users
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Dashboard
+  get 'dashboard', to: 'dashboard#index', as: 'dashboard'
+  root 'dashboard#index' # Set dashboard as root
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Projects
+  resources :projects do
+    resources :proposals, only: [:new, :create]
+  end
+
+  # Proposals
+  resources :proposals do
+    resources :comments, only: [:create, :destroy]
+    member do
+      patch :submit_review
+      patch :approve
+      patch :reject
+      patch :schedule
+      post :revert_version
+    end
+    collection do
+      get :export
+    end
+  end
+
+  # Slack Integration
+  post '/slack/commands', to: 'slack#commands'
+  post '/slack/interactions', to: 'slack#interactions'
+
+  # Admin Namespace
+  namespace :admin do
+    resources :proposals
+    resources :projects
+  end
+
+  # Sidekiq Web UI (only for development)
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq' if Rails.env.development?
 end
